@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-oceanfloor}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-oceanfloor}
+      POSTGRES_DB: ${POSTGRES_DB:-oceanfloor}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-oceanfloor}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  statistical-service:
+    build: ./statistical-service
+    ports:
+      - "8001:8001"
+
+  backend:
+    build: ./backend
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-oceanfloor}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-oceanfloor}
+      POSTGRES_DB: ${POSTGRES_DB:-oceanfloor}
+      STATISTICAL_SERVICE_URL: http://statistical-service:8001
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      LITERATURE_CONTACT_EMAIL: ${LITERATURE_CONTACT_EMAIL:-research@example.org}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      statistical-service:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api/v1}
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

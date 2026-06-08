@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="OceanFloor">
+  <defs>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f7a3a"/>
+      <stop offset="1" stop-color="#0f3d1a"/>
+    </linearGradient>
+    <linearGradient id="maroon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9a1a2a"/>
+      <stop offset="1" stop-color="#4a0a14"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="496" height="496" rx="88" ry="88" fill="#fdfdfb" stroke="#1f4d22" stroke-width="6"/>
+  <!-- Green C -->
+  <path d="M 360 130
+           A 150 150 0 1 0 360 382
+           L 330 340
+           A 100 100 0 1 1 330 172 Z"
+        fill="url(#green)"/>
+  <!-- Maroon F with curved top -->
+  <path d="M 250 150
+           C 300 130, 360 130, 400 170
+           C 360 200, 320 210, 290 220
+           L 290 260
+           C 320 250, 350 250, 380 270
+           C 350 290, 320 295, 290 300
+           L 290 410
+           L 250 410
+           Z"
+        fill="url(#maroon)"/>
+  <!-- Decorative dot swirl, lower-left -->
+  <g fill="#2f7a3a">
+    <circle cx="100" cy="320" r="9"/>
+    <circle cx="120" cy="345" r="7"/>
+    <circle cx="148" cy="372" r="6"/>
+  </g>
+  <g fill="#9a1a2a">
+    <circle cx="180" cy="392" r="6"/>
+    <circle cx="210" cy="408" r="5"/>
+    <circle cx="240" cy="418" r="4"/>
+  </g>
+  <g fill="#1f4d22" opacity="0.55">
+    <circle cx="135" cy="360" r="3"/>
+    <circle cx="165" cy="384" r="3"/>
+    <circle cx="195" cy="402" r="3"/>
+    <circle cx="225" cy="414" r="2.5"/>
+    <circle cx="255" cy="422" r="2"/>
+  </g>
+</svg>

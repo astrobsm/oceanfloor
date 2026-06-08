@@ -1,0 +1,12 @@
+# Ranges (see backend/requirements.txt note on pinning strategy).
+fastapi>=0.111,<0.116
+uvicorn[standard]>=0.30,<0.32
+pydantic>=2.7,<3
+numpy>=1.26,<3
+scipy>=1.13,<2
+statsmodels>=0.14,<1
+pandas>=2.2,<3
+lifelines>=0.28,<1
+
+# Optional R bridge (uncomment if an R runtime is available in the image)
+# rpy2>=3.5,<4
