@@ -1,0 +1,38 @@
+# fly.toml - Fly.io app config for OceanFloor statistical microservice.
+# Generated to deploy statistical-service/Dockerfile to https://oceanfloor-stats.fly.dev
+# After `fly deploy`, set STATISTICAL_SERVICE_URL=https://<app>.fly.dev in Vercel.
+
+app = "oceanfloor-stats"
+primary_region = "iad"  # Ashburn, VA - close to Vercel's default `iad1`
+
+[build]
+  # Uses the Dockerfile in this directory.
+
+[http_service]
+  internal_port = 8001
+  force_https = true
+  # Scale-to-zero: machine sleeps when idle, wakes on first HTTP request.
+  # Cold start adds ~3-5s to the first request, then stays warm.
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 20
+    hard_limit = 25
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"  # SciPy + statsmodels + pandas + lifelines need headroom
+
+[checks]
+  [checks.healthz]
+    grace_period = "20s"
+    interval = "30s"
+    method = "GET"
+    path = "/health"
+    port = 8001
+    timeout = "5s"
+    type = "http"
