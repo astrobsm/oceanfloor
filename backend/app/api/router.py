@@ -2,6 +2,7 @@
 from fastapi import APIRouter
 
 from app.api.routes import (
+    auth,
     collaboration,
     discussion,
     export,
@@ -23,6 +24,7 @@ from app.api.routes import (
 )
 
 api_router = APIRouter()
+api_router.include_router(auth.router)
 api_router.include_router(ideas.router)
 api_router.include_router(proposals.router)
 api_router.include_router(literature.router)

@@ -1,4 +1,5 @@
-import { NavLink, Navigate, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Projects from "./pages/Projects";
 import ProjectWorkspace from "./pages/ProjectWorkspace";
 import Dashboard from "./pages/Dashboard";
@@ -24,6 +25,12 @@ import GrantsDiscover from "./pages/GrantsDiscover";
 import GrantWorkspace from "./pages/GrantWorkspace";
 import JoinShare from "./pages/JoinShare";
 import ParticipantWorkspace from "./pages/ParticipantWorkspace";
+import InstallPrompt from "./components/InstallPrompt";
+import Login from "./pages/Login";
+import ChangePassword from "./pages/ChangePassword";
+import Admin from "./pages/Admin";
+import { useAuth } from "./store/auth";
+import { ROLE_LABELS } from "./api/auth";
 
 const PRIMARY = [
   { to: "/projects", label: "Projects", end: false },
@@ -52,8 +59,78 @@ const TOOLS = [
 ];
 
 export default function App() {
+  const [navOpen, setNavOpen] = useState(false);
+  const location = useLocation();
+  const {
+    loading,
+    isAuthenticated,
+    mustChangePassword,
+    user,
+    logout,
+    isAdmin,
+  } = useAuth();
+
+  // Close the mobile drawer whenever the route changes.
+  useEffect(() => {
+    setNavOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll while the drawer is open on mobile.
+  useEffect(() => {
+    document.body.style.overflow = navOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [navOpen]);
+
+  // --- Auth gates ----------------------------------------------------------
+  if (loading) {
+    return (
+      <div className="auth-loading">
+        <div className="auth-loading-card">
+          <img src="/icon.png" alt="" className="auth-loading-logo" />
+          <div className="spinner" />
+          <p>Loading OceanFloor&hellip;</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Login />;
+  }
+
+  if (mustChangePassword) {
+    return <ChangePassword />;
+  }
+
   return (
-    <div className="layout">
+    <div className={`layout${navOpen ? " nav-open" : ""}`}>
+      <header className="topbar">
+        <button
+          className="nav-toggle"
+          type="button"
+          aria-label={navOpen ? "Close menu" : "Open menu"}
+          aria-expanded={navOpen}
+          aria-controls="primary-navigation"
+          onClick={() => setNavOpen((v) => !v)}
+        >
+          <span className="nav-toggle-bar" />
+          <span className="nav-toggle-bar" />
+          <span className="nav-toggle-bar" />
+        </button>
+        <div className="topbar-brand">
+          <img src="/icon.png" alt="" className="topbar-logo" />
+          <span>OceanFloor</span>
+        </div>
+      </header>
+
+      <div
+        className={`nav-scrim${navOpen ? " show" : ""}`}
+        onClick={() => setNavOpen(false)}
+        aria-hidden="true"
+      />
+
       <aside className="sidebar">
         <div className="brand">
           <img src="/icon.png" alt="" className="brand-logo" />
@@ -62,7 +139,7 @@ export default function App() {
             <div className="tag">Medical Research Assistant&trade;</div>
           </div>
         </div>
-        <nav className="nav">
+        <nav className="nav" id="primary-navigation">
           {PRIMARY.map((item) => (
             <NavLink
               key={item.to}
@@ -83,7 +160,39 @@ export default function App() {
               {item.label}
             </NavLink>
           ))}
+          {isAdmin && (
+            <>
+              <div className="nav-section-label">Administration</div>
+              <NavLink
+                to="/admin"
+                className={({ isActive }) => (isActive ? "active primary" : "primary")}
+              >
+                User Management
+              </NavLink>
+            </>
+          )}
         </nav>
+        {user && (
+          <div className="sidebar-user">
+            <div className="sidebar-user-avatar" aria-hidden="true">
+              {(user.full_name || user.username).charAt(0).toUpperCase()}
+            </div>
+            <div className="sidebar-user-meta">
+              <span className="sidebar-user-name">
+                {user.full_name || user.username}
+              </span>
+              <span className="sidebar-user-role">{ROLE_LABELS[user.role]}</span>
+            </div>
+            <button
+              className="sidebar-logout"
+              onClick={logout}
+              aria-label="Sign out"
+              title="Sign out"
+            >
+              Sign out
+            </button>
+          </div>
+        )}
       </aside>
       <main className="content">
         <Routes>
@@ -113,8 +222,11 @@ export default function App() {
           <Route path="/journals" element={<JournalMatch />} />
           <Route path="/export" element={<ExportPage />} />
           <Route path="/ocean" element={<KnowledgeOcean />} />
+          {isAdmin && <Route path="/admin" element={<Admin />} />}
+          <Route path="/change-password" element={<ChangePassword />} />
         </Routes>
       </main>
+      <InstallPrompt />
     </div>
   );
 }

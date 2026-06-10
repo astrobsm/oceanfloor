@@ -25,6 +25,14 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     algorithm: str = "HS256"
 
+    # Bootstrap superadmin (seeded by `python -m app.core.bootstrap`).
+    # The initial password equals the username; the account is flagged to
+    # require a password change on first login.
+    superadmin_username: str = "superadmin"
+    superadmin_email: str = "superadmin@oceanfloor.local"
+    superadmin_phone: str | None = None
+    superadmin_full_name: str = "Platform Owner"
+
     # CORS (comma separated). Also accepts a regex via cors_origin_regex
     # for Vercel preview URLs (e.g. ^https://.*\.vercel\.app$).
     cors_origins: str = "http://localhost:5173"
