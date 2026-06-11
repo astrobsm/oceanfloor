@@ -1,4 +1,4 @@
-"""One-shot database bootstrap: create all tables on the configured DB.
+r"""One-shot database bootstrap: create all tables on the configured DB.
 
 Run this once after pointing the backend at a fresh Supabase project:
 
